@@ -49,47 +49,49 @@ const getToken = async () => {
     })
 }
 
-const getResponse = async () => {
-    try {
-        const accessToken = await getToken();
-        const res = await fetch("https://chat.openai.com/backend-api/conversation", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + accessToken,
-            },
-            body: JSON.stringify({
-                action: "next",
-                messages: [
-                    {
-                        id: uid(),
-                        role: "user",
-                        content: {
-                            content_type: "text",
-                            parts: ["Hello"]
+const getResponse = async (question) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const accessToken = await getToken();
+            const res = await fetch("https://chat.openai.com/backend-api/conversation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + accessToken,
+                },
+                body: JSON.stringify({
+                    action: "next",
+                    messages: [
+                        {
+                            id: uid(),
+                            role: "user",
+                            content: {
+                                content_type: "text",
+                                parts: [question]
+                            }
                         }
-                    }
-                ],
-                model: "text-davinci-002-render",
-                parent_message_id: uid()
-            })
-        })   
+                    ],
+                    model: "text-davinci-002-render",
+                    parent_message_id: uid()
+                })
+            })   
 
-        const data = await res.text()
-        return data
-    } catch (e) {
-        return("ERROR")
-    }
-}
-
-const main = async () => {
-    const data = await getResponse()
-    // console.log(data)
-    chrome.tabs.onUpdated.addListener(() => {
-        chrome.runtime.sendMessage({
-            msg: data
-        })
+            const data = await res.text()
+            resolve(data)
+        } catch (e) {
+            if (e === "CLOUDFLARE") {
+                reject("CLOUDFLARE")
+            } else {
+                reject("ERROR")
+            }
+        }
     })
 }
 
-main()
+chrome.runtime.onMessage.addListener( (request, sender, response) => {
+        const question = request.question
+        getResponse(question).then(answer => response(answer))
+        return true;
+})
+
+// handle cloudflare and errors

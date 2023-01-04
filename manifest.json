@@ -4,11 +4,17 @@
     "description": "A chrome extension that lets you select any text and run it through ChatGPT",
     "version": "1.0.0",
     "host_permissions": ["https://*.openai.com/"],
-    "permissions": ["storage"],
+    "permissions": ["storage", "tabs"],
     "action": {
         "default_popup": "popup.html"
     },
     "background": {
         "service_worker": "background.js"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["http://*/*", "https://*/*"],
+            "js": ["contentScript.js"]
+        }
+    ]
 }
