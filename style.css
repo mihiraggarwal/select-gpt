@@ -1,0 +1,53 @@
+@font-face {
+    font-family: proxima-nova;
+    src: url("assets/fonts/Proxima-Nova-Font.otf");
+}
+
+body {
+    background-color: #353441;
+    font-family: proxima-nova;
+    width:400px;
+    height:400px;
+}
+
+h1 {
+    color: #fff
+}
+
+.editable {
+    font-family: proxima-nova;
+    resize: none;
+    background-color: #454754;
+    color: #D1D5CA;
+    font-size: 3.75vh;
+    width: 94vw;
+    border: 0px;
+    border-radius: 2px;
+    padding: 1vw
+}
+
+.editable:empty:before {
+    content: attr(placeholder);
+    opacity: 0.5
+}
+
+.editable::-webkit-scrollbar {
+    width: 0 !important
+}
+
+#input {
+    height: 60px
+}
+
+#output {
+    height: 270px;
+}
+
+a {
+    text-decoration: none;
+    color: #16e16e;
+}
+
+a:hover {
+    cursor: pointer;
+}

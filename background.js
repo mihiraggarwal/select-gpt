@@ -90,8 +90,6 @@ const getResponse = async (question) => {
 
 chrome.runtime.onMessage.addListener( (request, sender, response) => {
         const question = request.question
-        getResponse(question).then(answer => response(answer))
+        getResponse(question).then(answer => response(answer)).catch((e) => response(e))
         return true;
 })
-
-// handle cloudflare and errors
