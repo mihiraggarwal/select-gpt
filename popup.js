@@ -14,15 +14,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (answer !== "CLOUDFLARE" && answer !== "ERROR") {
             try {
                 let res = await answer.split("data:")
-                res = res[1].trim()
-                if (res === "[DONE]") return
-                answer = JSON.parse(res)
-                const final = answer.message.content.parts[0]
-                document.getElementById('output').style.opacity = 1
-                document.getElementById('output').innerHTML = final
+                try {
+                    const detail = JSON.parse(res[0]).detail
+                    document.getElementById('output').style.opacity = 1
+                    document.getElementById('output').innerHTML = detail
+                    return;
+                } catch (e) {
+                    try {
+                        res = res[1].trim()
+                        if (res === "[DONE]") return
+                        answer = JSON.parse(res)
+                        const final = answer.message.content.parts[0]
+                        document.getElementById('output').style.opacity = 1
+                        document.getElementById('output').innerHTML = final
+                    } catch (e) {}
+                }
             } catch (e) {
                 document.getElementById('output').style.opacity = 1
-                document.getElementById('output').innerHTML = "Too many requests made in an hour. Try again later"
+                document.getElementById('output').innerHTML = "Something went wrong. Please try in a few minutes."
             }
 
         } else if (answer === "CLOUDFLARE") {
