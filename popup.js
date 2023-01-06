@@ -12,17 +12,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const showPopup = async (answer) => {
         if (answer !== "CLOUDFLARE" && answer !== "ERROR") {
-            let datalist = await answer.split('data:')
-            let data = await datalist.slice(1, datalist.length-2)
-            for (let i = 0; i < data.length; i++) {
-                let element = data[i]
-                element = element.trim()
-                element = await JSON.parse(element)
-                setTimeout(() => {
-                    document.getElementById('output').style.opacity = 1
-                    document.getElementById('output').innerHTML = element.message.content.parts[0]
-                }, (i+1)*100)
-            };
+            try {
+                let res = await answer.split("data:")
+                res = res[1].trim()
+                if (res === "[DONE]") return
+                answer = JSON.parse(res)
+                const final = answer.message.content.parts[0]
+                document.getElementById('output').style.opacity = 1
+                document.getElementById('output').innerHTML = final
+            } catch (e) {
+                document.getElementById('output').style.opacity = 1
+                document.getElementById('output').innerHTML = "Too many requests made in an hour. Try again later"
+            }
+
         } else if (answer === "CLOUDFLARE") {
             document.getElementById('input').style.opacity = 1
             document.getElementById('input').innerHTML = 'You need to once visit <a target="_blank" href="https://chat.openai.com/chat">chat.openai.com</a> and check if the connection is secure. Redirecting...'
@@ -40,7 +42,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('input').innerHTML = selection
             document.getElementById('output').style.opacity = 0.5
             document.getElementById('output').innerHTML = "Loading..."
-            chrome.runtime.sendMessage({question: selection}, showPopup)
+            const port = chrome.runtime.connect();
+            port.postMessage({question: selection})
+            port.onMessage.addListener((msg) => showPopup(msg))
         } else {
             document.getElementById('input').style.opacity = 0.5
             document.getElementById('input').innerHTML = "You have to first select some text"

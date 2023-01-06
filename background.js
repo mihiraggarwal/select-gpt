@@ -75,9 +75,7 @@ const getResponse = async (question) => {
                     parent_message_id: uid()
                 })
             })   
-
-            const data = await res.text()
-            resolve(data)
+            resolve(res.body)
         } catch (e) {
             if (e === "CLOUDFLARE") {
                 reject("CLOUDFLARE")
@@ -88,8 +86,18 @@ const getResponse = async (question) => {
     })
 }
 
-chrome.runtime.onMessage.addListener( (request, sender, response) => {
-        const question = request.question
-        getResponse(question).then(answer => response(answer)).catch((e) => response(e))
-        return true;
+chrome.runtime.onConnect.addListener((port) => {
+    port.onMessage.addListener((msg) => {
+        const question = msg.question
+        getResponse(question).then(async answer => {
+            const resRead = answer.getReader()
+            while (true) {
+                const {done, value} = await resRead.read()
+                if (done) break
+                if (done === undefined || value === undefined) port.postMessage('ERROR')
+                const data = new TextDecoder().decode(value)
+                port.postMessage(data)
+            }
+        }).catch((e) => port.postMessage(e))
+    })
 })
