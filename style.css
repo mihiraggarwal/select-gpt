@@ -23,7 +23,8 @@ h1 {
     width: 94vw;
     border: 0px;
     border-radius: 2px;
-    padding: 1vw
+    padding: 1vw;
+    overflow-y: scroll;
 }
 
 .editable:empty:before {
