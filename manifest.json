@@ -5,6 +5,9 @@
     "version": "1.0.0",
     "host_permissions": ["https://*.openai.com/"],
     "permissions": ["storage", "tabs"],
+    "icons": {
+        "512": "assets/icons/hexagonal.png"
+    },
     "action": {
         "default_popup": "popup.html"
     },
