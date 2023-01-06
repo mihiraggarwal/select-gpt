@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         res = res[1].trim()
                         if (res === "[DONE]") return
                         answer = JSON.parse(res)
-                        const final = answer.message.content.parts[0]
+                        let final = answer.message.content.parts[0]
+                        final = final.replace(/\n/g,'<br>')
                         document.getElementById('output').style.opacity = 1
                         document.getElementById('output').innerHTML = final
                     } catch (e) {}
